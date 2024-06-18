@@ -227,67 +227,67 @@ int main()
     {
         system("cls");
         printf("\nMenu:\n");
-        printf("1 - Cadastrar quarto\n");
-        printf("2 - Buscar quarto\n");
-        printf("3 - Cadastrar estadia\n");
-        printf("4 - Cadastrar cliente\n");
-        printf("5 - Buscar cliente por código\n");
-        printf("6 - Buscar cliente por nome\n");
-        printf("7 - Buscar estadia por cliente\n");
-        printf("11 - Sair\n");
+        printf("3 - Cadastrar cliente\n");
+        printf("4 - Buscar cliente por código\n");
+        printf("5 - Buscar cliente por nome\n");
+        printf("6 - Cadastrar quarto\n");
+        printf("7 - Buscar quarto\n");
+        printf("8 - Cadastrar estadia\n");
+        printf("9 - Buscar estadia por cliente\n");
+        printf("12 - Sair\n");
         printf("\nDigite a opção desejada: ");
         scanf("%d", &opcao);
         getchar();
 
         switch (opcao)
         {
-        case 1:
-            cadastrarQuarto(&listaQuartos, &totalQuartos);
-            break;
-        case 2:
-            printf("\nDigite o número do quarto que deseja buscar: ");
-            int numeroQuarto;
-            scanf("%d", &numeroQuarto);
-            buscarQuarto(listaQuartos, totalQuartos, numeroQuarto);
-            break;
         case 3:
-            cadastrarEstadia(&listaEstadias, &totalEstadias);
-            break;
-        case 4:
             cadastrarCliente(clientes, &numClientes);
             break;
-        case 5:
+        case 4:
             printf("Digite o código do cliente: ");
             scanf("%d", &codigo);
             getchar();
             buscarClientePorCodigo(clientes, numClientes, codigo);
             break;
-        case 6:
+        case 5:
             printf("Digite o nome do cliente: ");
             char nome[50];
             fgets(nome, sizeof(nome), stdin);
             nome[strcspn(nome, "\n")] = 0;
             buscarClientePorNome(clientes, numClientes, nome);
             break;
+        case 6:
+            cadastrarQuarto(&listaQuartos, &totalQuartos);
+            break;
         case 7:
+            printf("\nDigite o número do quarto que deseja buscar: ");
+            int numeroQuarto;
+            scanf("%d", &numeroQuarto);
+            buscarQuarto(listaQuartos, totalQuartos, numeroQuarto);
+            break;
+        case 8:
+            cadastrarEstadia(&listaEstadias, &totalEstadias);
+            break;
+        case 9:
             printf("Digite o código do cliente: ");
             int codigoCliente;
             scanf("%d", &codigoCliente);
             getchar();
             mostrarEstadiaPorCliente(estadias, totalEstadias, codigoCliente);
             break;
-        case 11:
+        case 12:
             printf("\nSaindo...\n");
             break;
         default:
             printf("\nOpção inválida.\n");
         }
-        if (opcao != 11)
+        if (opcao != 12)
         {
             printf("\nPressione qualquer tecla para prosseguir.\n");
             getch();
         }
-    } while (opcao != 11);
+    } while (opcao != 12);
 
     free(listaQuartos);
     free(listaEstadias);
