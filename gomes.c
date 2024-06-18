@@ -68,9 +68,9 @@ typedef struct
 int converterDataParaDias(char *data) {
     struct tm estruturaTempo = {0};
     sscanf(data, "%d/%d/%d", &estruturaTempo.tm_mday, &estruturaTempo.tm_mon, &estruturaTempo.tm_year);
-    estruturaTempo.tm_mon--; // tm_mon é baseado em 0
-    estruturaTempo.tm_year -= 1900; // tm_year é anos desde 1900
-    return mktime(&estruturaTempo) / (60 * 60 * 24); // converter para dias
+    estruturaTempo.tm_mon--;
+    estruturaTempo.tm_year -= 1900;
+    return mktime(&estruturaTempo) / (60 * 60 * 24);
 }
 
 void cadastrarEstadia(Estadia **estadias, int *totalEstadias) {
