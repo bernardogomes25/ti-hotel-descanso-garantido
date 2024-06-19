@@ -36,11 +36,11 @@ void cadastrarCliente(Cliente clientes[], int *numClientes)
 
     printf("Digite o endereco do cliente: ");
     fgets(cliente->endereco, sizeof(cliente->endereco), stdin);
-    cliente->endereco[strcspn(cliente->endereco, "\n")] = '\0'; // Remover o newline do final
+    cliente->endereco[strcspn(cliente->endereco, "\n")] = '\0';
 
     printf("Digite o telefone do cliente: ");
     fgets(cliente->telefone, sizeof(cliente->telefone), stdin);
-    cliente->telefone[strcspn(cliente->telefone, "\n")] = '\0'; // Remover o newline do final
+    cliente->telefone[strcspn(cliente->telefone, "\n")] = '\0';
 
     (*numClientes)++;
 }
@@ -202,7 +202,7 @@ void mostrarEstadiaPorCliente(Estadia *estadias, int totalEstadias, int codigoCl
     }
     if (!encontrou)
     {
-        printf("Nenhuma estadia encontrada para o cliente com código %d\n", codigoCliente);
+        printf("\nNenhuma estadia encontrada para o cliente com código %d\n", codigoCliente);
     }
 }
 // fim funcionalidade 8
@@ -245,13 +245,13 @@ int main()
             cadastrarCliente(clientes, &numClientes);
             break;
         case 4:
-            printf("Digite o código do cliente: ");
+            printf("\nDigite o código do cliente: ");
             scanf("%d", &codigo);
             getchar();
             buscarClientePorCodigo(clientes, numClientes, codigo);
             break;
         case 5:
-            printf("Digite o nome do cliente: ");
+            printf("\nDigite o nome do cliente: ");
             char nome[50];
             fgets(nome, sizeof(nome), stdin);
             nome[strcspn(nome, "\n")] = 0;
@@ -270,7 +270,7 @@ int main()
             cadastrarEstadia(&listaEstadias, &totalEstadias);
             break;
         case 9:
-            printf("Digite o código do cliente: ");
+            printf("\nDigite o código do cliente: ");
             int codigoCliente;
             scanf("%d", &codigoCliente);
             getchar();
