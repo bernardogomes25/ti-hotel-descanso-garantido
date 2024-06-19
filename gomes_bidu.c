@@ -16,67 +16,60 @@ typedef struct
     int totalEstadias;
 } Cliente;
 
-void cadastrarCliente(Cliente clientes[], int *numClientes)
+void cadastrarCliente(FILE *file)
 {
-    if (*numClientes >= MAX_CLIENTES)
-    {
-        printf("Número máximo de clientes atingido.\n");
-        return;
-    }
-
-    Cliente *cliente = &clientes[*numClientes];
+    Cliente cliente;
 
     printf("Digite o codigo do cliente: ");
-    scanf("%d", &cliente->codigo);
-    getchar();
-
+    scanf("%d", &cliente.codigo);
     printf("Digite o nome do cliente: ");
-    fgets(cliente->nome, sizeof(cliente->nome), stdin);
-    cliente->nome[strcspn(cliente->nome, "\n")] = '\0';
-
+    scanf("%s", cliente.nome);
     printf("Digite o endereco do cliente: ");
-    fgets(cliente->endereco, sizeof(cliente->endereco), stdin);
-    cliente->endereco[strcspn(cliente->endereco, "\n")] = '\0';
-
+    scanf("%s", cliente.endereco);
     printf("Digite o telefone do cliente: ");
-    fgets(cliente->telefone, sizeof(cliente->telefone), stdin);
-    cliente->telefone[strcspn(cliente->telefone, "\n")] = '\0';
+    scanf("%s", cliente.telefone);
+    cliente.totalEstadias = 0;
 
-    (*numClientes)++;
+    fseek(file, 0, SEEK_END);
+    fwrite(&cliente, sizeof(Cliente), 1, file);
 }
 // fim funcionalidade 3
 
 // inicio funcionalidade 4
-void exibirCliente(Cliente cliente)
+ void buscarClientePorCodigo(FILE *file, int codigo)
 {
-    printf("\nDados do Cliente:\n");
-    printf("Codigo: %d\n", cliente.codigo);
-    printf("Nome: %s\n", cliente.nome);
-    printf("Endereco: %s\n", cliente.endereco);
-    printf("Telefone: %s\n", cliente.telefone);
-}
+    Cliente cliente;
 
-void buscarClientePorCodigo(Cliente clientes[], int numClientes, int codigo)
-{
-    for (int i = 0; i < numClientes; i++)
+    rewind(file);
+    while (fread(&cliente, sizeof(Cliente), 1, file) == 1)
     {
-        if (clientes[i].codigo == codigo)
+        if (cliente.codigo == codigo)
         {
-            exibirCliente(clientes[i]);
-            return;
+            printf("Codigo: %d\n", cliente.codigo);
+            printf("Nome: %s\n", cliente.nome);
+            printf("Endereco: %s\n", cliente.endereco);
+            printf("Telefone: %s\n", cliente.telefone);
+            printf("Total de estadias: %d\n", cliente.totalEstadias);
+            break;
         }
     }
-    printf("Cliente com código %d não encontrado.\n", codigo);
 }
 
-void buscarClientePorNome(Cliente clientes[], int numClientes, char *nome)
+void buscarClientePorNome(FILE *file, char *nome)
 {
+    Cliente cliente;
     int found = 0;
-    for (int i = 0; i < numClientes; i++)
+
+    rewind(file);
+    while (fread(&cliente, sizeof(Cliente), 1, file) == 1)
     {
-        if (strstr(clientes[i].nome, nome) != NULL)
+        if (strstr(cliente.nome, nome) != NULL)
         {
-            exibirCliente(clientes[i]);
+            printf("Codigo: %d\n", cliente.codigo);
+            printf("Nome: %s\n", cliente.nome);
+            printf("Endereco: %s\n", cliente.endereco);
+            printf("Telefone: %s\n", cliente.telefone);
+            printf("Total de estadias: %d\n", cliente.totalEstadias);
             found = 1;
         }
     }
@@ -97,47 +90,39 @@ typedef struct
     int clienteId;
 } Quarto;
 
-void cadastrarQuarto(Quarto **quartos, int *totalQuartos)
+void cadastrarQuarto(FILE *file)
 {
-    *quartos = (Quarto *)realloc(*quartos, (*totalQuartos + 1) * sizeof(Quarto));
-    if (*quartos == NULL)
-    {
-        printf("Erro ao alocar memória.\n");
-        return;
-    }
+    Quarto quarto;
 
     printf("Digite o número do quarto: ");
-    scanf("%d", &(*quartos)[*totalQuartos].numero);
+    scanf("%d", &quarto.numero);
     printf("Digite a quantidade de hóspedes: ");
-    scanf("%d", &(*quartos)[*totalQuartos].quantidadeHospedes);
+    scanf("%d", &quarto.quantidadeHospedes);
     printf("Digite o valor da diária: ");
-    scanf("%f", &(*quartos)[*totalQuartos].valorDiaria);
-    int disponibilidade;
-    do {
-        printf("Digite a disponibilidade do quarto (1 para ocupado, 0 para desocupado): ");
-        scanf("%d", &disponibilidade);
-        if (disponibilidade != 0 && disponibilidade != 1) {
-            printf("Entrada inválida. Por favor, digite 0 para desocupado ou 1 para ocupado.\n");
-        }
-    } while (disponibilidade != 0 && disponibilidade != 1);
-    (*quartos)[*totalQuartos].disponibilidade = disponibilidade;
+    scanf("%f", &quarto.valorDiaria);
+    printf("Digite a disponibilidade do quarto (1 para ocupado, 0 para desocupado): ");
+    scanf("%d", &quarto.disponibilidade);
+    quarto.clienteId = -1;
 
-
-    (*totalQuartos)++;
+    fseek(file, 0, SEEK_END);
+    fwrite(&quarto, sizeof(Quarto), 1, file);
 }
 // fim funcionalidade 5
 
 // inicio funcionalidade 6
-void buscarQuarto(Quarto *quartos, int totalQuartos, int numeroQuarto)
+void buscarQuarto(FILE *file, int numeroQuarto)
 {
-    for (int i = 0; i < totalQuartos; i++)
+    Quarto quarto;
+
+    rewind(file);
+    while (fread(&quarto, sizeof(Quarto), 1, file) == 1)
     {
-        if (quartos[i].numero == numeroQuarto)
+        if (quarto.numero == numeroQuarto)
         {
-            printf("\nNúmero do quarto: %d\n", quartos[i].numero);
-            printf("Quantidade de hóspedes: %d\n", quartos[i].quantidadeHospedes);
-            printf("Valor da diária: %.2f\n", quartos[i].valorDiaria);
-            printf("Disponibilidade: %s\n", quartos[i].disponibilidade ? "Ocupado" : "Desocupado");
+            printf("\nNúmero do quarto: %d\n", quarto.numero);
+            printf("Quantidade de hóspedes: %d\n", quarto.quantidadeHospedes);
+            printf("Valor da diária: %.2f\n", quarto.valorDiaria);
+            printf("Disponibilidade: %s\n", quarto.disponibilidade ? "Ocupado" : "Desocupado");
             return;
         }
     }
@@ -159,51 +144,79 @@ typedef struct
 int converterDataParaDias(char *data)
 {
     struct tm estruturaTempo = {0};
-    sscanf(data, "%d/%d/%d", &estruturaTempo.tm_mday, &estruturaTempo.tm_mon, &estruturaTempo.tm_year);
+    if (sscanf(data, "%d/%d/%d", &estruturaTempo.tm_mday, &estruturaTempo.tm_mon, &estruturaTempo.tm_year) != 3)
+    {
+        printf("Erro ao ler a data. Certifique-se de que ela está no formato dd/mm/aaaa.\n");
+        return -1;
+    }
     estruturaTempo.tm_mon--;
     estruturaTempo.tm_year -= 1900;
-    return mktime(&estruturaTempo) / (60 * 60 * 24);
+    time_t tempo = mktime(&estruturaTempo);
+    if (tempo == (time_t)-1)
+    {
+        printf("Erro ao converter a data para dias.\n");
+        return -1;
+    }
+    return tempo / (60 * 60 * 24);
 }
 
-void cadastrarEstadia(Estadia **estadias, int *totalEstadias)
+#include <time.h>
+#include <stdio.h>
+
+int calcularDiferencaDias(char *dataInicio, char *dataFim) {
+    struct tm inicio = {0}, fim = {0};
+    double diferenca;
+
+    sscanf(dataInicio, "%d-%d-%d", &inicio.tm_mday, &inicio.tm_mon, &inicio.tm_year);
+    inicio.tm_mon -= 1;  
+    inicio.tm_year -= 1900; 
+
+    sscanf(dataFim, "%d-%d-%d", &fim.tm_mday, &fim.tm_mon, &fim.tm_year);
+    fim.tm_mon -= 1; 
+    fim.tm_year -= 1900;
+
+    diferenca = difftime(mktime(&fim), mktime(&inicio)) / (60 * 60 * 24);
+
+    return (int)diferenca;
+}
+
+void cadastrarEstadia(FILE *file)
 {
-#define MAX_ESTADIAS 10
+    Estadia estadia;
 
-    *estadias = (Estadia *)realloc(*estadias, (*totalEstadias + 1) * sizeof(Estadia));
     printf("Digite o código da estadia: ");
-    scanf("%d", &(*estadias)[*totalEstadias].codigoEstadia);
+    scanf("%d", &estadia.codigoEstadia);
     printf("Digite a data de entrada (dd/mm/aaaa): ");
-    scanf("%s", (*estadias)[*totalEstadias].dataEntrada);
+    scanf("%s", estadia.dataEntrada);
     printf("Digite a data de saída (dd/mm/aaaa): ");
-    scanf("%s", (*estadias)[*totalEstadias].dataSaida);
-
-    int entrada = converterDataParaDias((*estadias)[*totalEstadias].dataEntrada);
-    int saida = converterDataParaDias((*estadias)[*totalEstadias].dataSaida);
-    (*estadias)[*totalEstadias].quantidadeDiarias = saida - entrada;
-
-    printf("Digite o número do quarto: ");
-    scanf("%d", &(*estadias)[*totalEstadias].numeroQuarto);
-
+    scanf("%s", estadia.dataSaida);
+    estadia.quantidadeDiarias = calcularDiferencaDias(estadia.dataEntrada, estadia.dataSaida);
     printf("Digite o código do cliente: ");
-    scanf("%d", &(*estadias)[*totalEstadias].codigoCliente);
+    scanf("%d", &estadia.codigoCliente);
+    printf("Digite o número do quarto: ");
+    scanf("%d", &estadia.numeroQuarto);
 
-    (*totalEstadias)++;
+    fseek(file, 0, SEEK_END);
+    fwrite(&estadia, sizeof(Estadia), 1, file);
 }
 // fim funcionalidade 7
 
 // inicio funcionalidade 8
-void mostrarEstadiaPorCliente(Estadia *estadias, int totalEstadias, int codigoCliente)
+void mostrarEstadiaPorCliente(FILE *file, int codigoCliente)
 {
+    Estadia estadia;
     int encontrou = 0;
-    for (int i = 0; i < totalEstadias; i++)
+
+    rewind(file);
+    while (fread(&estadia, sizeof(Estadia), 1, file) == 1)
     {
-        if (estadias[i].codigoCliente == codigoCliente)
+        if (estadia.codigoCliente == codigoCliente)
         {
-            printf("Código da estadia: %d\n", estadias[i].codigoEstadia);
-            printf("Data de entrada: %s\n", estadias[i].dataEntrada);
-            printf("Data de saída: %s\n", estadias[i].dataSaida);
-            printf("Quantidade de diárias: %d\n", estadias[i].quantidadeDiarias);
-            printf("Número do quarto: %d\n", estadias[i].numeroQuarto);
+            printf("Código da estadia: %d\n", estadia.codigoEstadia);
+            printf("Data de entrada: %s\n", estadia.dataEntrada);
+            printf("Data de saída: %s\n", estadia.dataSaida);
+            printf("Quantidade de diárias: %d\n", estadia.quantidadeDiarias);
+            printf("Número do quarto: %d\n", estadia.numeroQuarto);
             encontrou = 1;
             break;
         }
@@ -218,87 +231,77 @@ void mostrarEstadiaPorCliente(Estadia *estadias, int totalEstadias, int codigoCl
 // inicio main
 int main()
 {
-    setlocale(LC_ALL, "Portuguese");
-
-    Cliente clientes[MAX_CLIENTES];
-    int numClientes = 0;
-    int codigo;
-
-    Quarto *listaQuartos = NULL;
-    int totalQuartos = 0;
-    Estadia *listaEstadias = NULL;
-    Estadia estadias[5];
-    int totalEstadias = 0;
     int opcao;
+    int numeroQuarto;
+    int codigoCliente;
+    int codigoClienteBuscar;
+    char nomeCliente[50];
+    FILE *fileQuartos = fopen("quartos.dat", "wb");
+    FILE *fileEstadias = fopen("estadias.dat", "wb");
+    FILE *fileClientes = fopen("clientes.dat", "wb");
+
+    if (fileQuartos == NULL || fileEstadias == NULL || fileClientes == NULL)
+    {
+        printf("Erro ao abrir os arquivos.\n");
+        return 1;
+    }
 
     do
     {
-        system("cls");
         printf("\nMenu:\n");
-        printf("3 - Cadastrar cliente\n");
-        printf("4 - Buscar cliente por código\n");
-        printf("5 - Buscar cliente por nome\n");
-        printf("6 - Cadastrar quarto\n");
-        printf("7 - Buscar quarto\n");
-        printf("8 - Cadastrar estadia\n");
-        printf("9 - Buscar estadia por cliente\n");
-        printf("12 - Sair\n");
-        printf("\nDigite a opção desejada: ");
+        printf("3. Cadastrar cliente\n");
+        printf("4. Buscar cliente por codigo\n");
+        printf("5. Buscar cliente por nome\n");
+        printf("6. Cadastrar quarto\n");
+        printf("7. Buscar quarto\n");
+        printf("8. Cadastrar estadia\n");
+        printf("9. Buscar estadia por cliente\n");
+        printf("12. Sair\n");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
-        getchar();
 
         switch (opcao)
         {
         case 3:
-            cadastrarCliente(clientes, &numClientes);
+            cadastrarCliente(fileClientes);
             break;
         case 4:
-            printf("\nDigite o código do cliente: ");
-            scanf("%d", &codigo);
-            getchar();
-            buscarClientePorCodigo(clientes, numClientes, codigo);
+            printf("Digite o código do cliente que deseja buscar: ");
+            scanf("%d", &codigoClienteBuscar);
+            buscarClientePorCodigo(fileClientes, codigoClienteBuscar);
             break;
         case 5:
-            printf("\nDigite o nome do cliente: ");
-            char nome[50];
-            fgets(nome, sizeof(nome), stdin);
-            nome[strcspn(nome, "\n")] = 0;
-            buscarClientePorNome(clientes, numClientes, nome);
+            printf("Digite o nome do cliente que deseja buscar: ");
+            scanf("%s", nomeCliente);
+            buscarClientePorNome(fileClientes, nomeCliente);
             break;
         case 6:
-            cadastrarQuarto(&listaQuartos, &totalQuartos);
+            cadastrarQuarto(fileQuartos);
             break;
         case 7:
-            printf("\nDigite o número do quarto que deseja buscar: ");
-            int numeroQuarto;
+            printf("Digite o número do quarto que deseja buscar: ");
             scanf("%d", &numeroQuarto);
-            buscarQuarto(listaQuartos, totalQuartos, numeroQuarto);
+            buscarQuarto(fileQuartos, numeroQuarto);
             break;
         case 8:
-            cadastrarEstadia(&listaEstadias, &totalEstadias);
+            cadastrarEstadia(fileEstadias);
             break;
         case 9:
-            printf("\nDigite o código do cliente: ");
-            int codigoCliente;
+            printf("Digite o código do cliente que deseja buscar estadias: ");
             scanf("%d", &codigoCliente);
-            getchar();
-            mostrarEstadiaPorCliente(estadias, totalEstadias, codigoCliente);
+            mostrarEstadiaPorCliente(fileEstadias, codigoCliente);
             break;
         case 12:
-            printf("\nSaindo...\n");
+            printf("Saindo...\n");
             break;
         default:
-            printf("\nOpção inválida.\n");
-        }
-        if (opcao != 12)
-        {
-            printf("\nPressione qualquer tecla para prosseguir.\n");
-            getch();
+            printf("Opção inválida.\n");
         }
     } while (opcao != 12);
 
-    free(listaQuartos);
-    free(listaEstadias);
+    fclose(fileQuartos);
+    fclose(fileEstadias);
+    fclose(fileClientes);
 
     return 0;
 }
