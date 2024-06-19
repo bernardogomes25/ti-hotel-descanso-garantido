@@ -112,8 +112,16 @@ void cadastrarQuarto(Quarto **quartos, int *totalQuartos)
     scanf("%d", &(*quartos)[*totalQuartos].quantidadeHospedes);
     printf("Digite o valor da diária: ");
     scanf("%f", &(*quartos)[*totalQuartos].valorDiaria);
-    printf("Digite a disponibilidade do quarto (1 para ocupado, 0 para desocupado): ");
-    scanf("%d", &(*quartos)[*totalQuartos].disponibilidade);
+    int disponibilidade;
+    do {
+        printf("Digite a disponibilidade do quarto (1 para ocupado, 0 para desocupado): ");
+        scanf("%d", &disponibilidade);
+        if (disponibilidade != 0 && disponibilidade != 1) {
+            printf("Entrada inválida. Por favor, digite 0 para desocupado ou 1 para ocupado.\n");
+        }
+    } while (disponibilidade != 0 && disponibilidade != 1);
+    (*quartos)[*totalQuartos].disponibilidade = disponibilidade;
+
 
     (*totalQuartos)++;
 }
