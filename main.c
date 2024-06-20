@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+<<<<<<< HEAD
 #include <locale.h>
 #include <conio.h>
 #include <time.h>
@@ -105,20 +106,39 @@ void buscarFuncionarioPorNome(FILE *file, char *nome) {
 #define MAX_CLIENTES 100
 typedef struct
 {
+=======
+#include <conio.h>
+
+#define MAX_CLIENTES 100
+
+typedef struct {
+>>>>>>> 056c94d (Cadastro de clientes)
     int codigo;
     char nome[100];
     char endereco[200];
     char telefone[15];
+<<<<<<< HEAD
     int totalEstadias;
 } Cliente;
 
 void cadastrarCliente(FILE *file)
 {
+=======
+} Cliente;
+
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void cadastrarCliente(FILE *file) {
+>>>>>>> 056c94d (Cadastro de clientes)
     Cliente cliente;
     Cliente clienteExistente;
 
     printf("\nDigite o codigo do cliente: ");
     scanf("%d", &cliente.codigo);
+<<<<<<< HEAD
     getchar();
     rewind(file);
     while (fread(&clienteExistente, sizeof(Cliente), 1, file) == 1)
@@ -139,10 +159,34 @@ void cadastrarCliente(FILE *file)
     scanf("%s", cliente.telefone);
     getchar();
     cliente.totalEstadias = 0;
+=======
+    limparBuffer();
+
+    rewind(file);
+    while (fread(&clienteExistente, sizeof(Cliente), 1, file) == 1) {
+        if (clienteExistente.codigo == cliente.codigo) {
+            printf("Erro: Ja existe um cliente com o codigo %d.\n", cliente.codigo);
+            return;
+        }
+    }
+
+    printf("Digite o nome do cliente: ");
+    fgets(cliente.nome, sizeof(cliente.nome), stdin);
+    cliente.nome[strcspn(cliente.nome, "\n")] = '\0';
+
+    printf("Digite o endereco do cliente: ");
+    fgets(cliente.endereco, sizeof(cliente.endereco), stdin);
+    cliente.endereco[strcspn(cliente.endereco, "\n")] = '\0';
+
+    printf("Digite o telefone do cliente: ");
+    fgets(cliente.telefone, sizeof(cliente.telefone), stdin);
+    cliente.telefone[strcspn(cliente.telefone, "\n")] = '\0';
+>>>>>>> 056c94d (Cadastro de clientes)
 
     fseek(file, 0, SEEK_END);
     fwrite(&cliente, sizeof(Cliente), 1, file);
 }
+<<<<<<< HEAD
 // fim funcionalidade 3
 
 // inicio funcionalidade 4
@@ -162,22 +206,40 @@ void buscarClientePorCodigo(FILE *file, int codigo)
     {
         if (cliente.codigo == codigo)
         {
+=======
+
+void buscarClientePorCodigo(FILE *file, int codigo) {
+    Cliente cliente;
+    int found = 0;
+
+    rewind(file);
+    while (fread(&cliente, sizeof(Cliente), 1, file) == 1) {
+        if (cliente.codigo == codigo) {
+>>>>>>> 056c94d (Cadastro de clientes)
             printf("\nCodigo: %d\n", cliente.codigo);
             printf("Nome: %s\n", cliente.nome);
             printf("Endereco: %s\n", cliente.endereco);
             printf("Telefone: %s\n", cliente.telefone);
+<<<<<<< HEAD
             printf("Total de estadias: %d\n", cliente.totalEstadias);
+=======
+>>>>>>> 056c94d (Cadastro de clientes)
             found = 1;
             break;
         }
     }
 
+<<<<<<< HEAD
     if (!found)
     {
+=======
+    if (!found) {
+>>>>>>> 056c94d (Cadastro de clientes)
         printf("\nCliente com o codigo %d nao foi encontrado.\n", codigo);
     }
 }
 
+<<<<<<< HEAD
 void buscarClientePorNome(FILE *file, char *nome)
 {
     Cliente cliente;
@@ -194,15 +256,28 @@ void buscarClientePorNome(FILE *file, char *nome)
     {
         if (strstr(cliente.nome, nome) != NULL)
         {
+=======
+void buscarClientePorNome(FILE *file, char *nome) {
+    Cliente cliente;
+    int found = 0;
+
+    rewind(file);
+    while (fread(&cliente, sizeof(Cliente), 1, file) == 1) {
+        if (strstr(cliente.nome, nome) != NULL) {
+>>>>>>> 056c94d (Cadastro de clientes)
             printf("\nCodigo: %d\n", cliente.codigo);
             printf("Nome: %s\n", cliente.nome);
             printf("Endereco: %s\n", cliente.endereco);
             printf("Telefone: %s\n", cliente.telefone);
+<<<<<<< HEAD
             printf("Total de estadias: %d\n", cliente.totalEstadias);
+=======
+>>>>>>> 056c94d (Cadastro de clientes)
             found = 1;
         }
     }
 
+<<<<<<< HEAD
     if (!found)
     {
         printf("\nCliente com o nome %s nao foi encontrado.\n", nome);
@@ -379,10 +454,28 @@ int main()
         if ((fileQuartos = fopen("quartos.dat", "w+b")) == NULL)
         {
             printf("\nErro na criação do arquivo quartos.dat!!\n");
+=======
+    if (!found) {
+        printf("\nCliente com o nome %s nao foi encontrado.\n", nome);
+    }
+}
+
+int main() {
+    int opcao;
+    int codigoClienteBuscar;
+    char nomeCliente[100];
+    FILE *fileClientes;
+
+    if ((fileClientes = fopen("clientes.dat", "r+b")) == NULL) {
+        printf("\nArquivo clientes.dat nao existia ... criando arquivo!\n");
+        if ((fileClientes = fopen("clientes.dat", "w+b")) == NULL) {
+            printf("\nErro na criacao do arquivo clientes.dat!!\n");
+>>>>>>> 056c94d (Cadastro de clientes)
             exit(1);
         }
     }
 
+<<<<<<< HEAD
     if ((fileEstadias = fopen("estadias.dat", "r+b")) == NULL)
     {
         printf("\nArquivo estadias.dat não existia ... criando arquivo!\n");
@@ -518,3 +611,46 @@ int main()
     return 0;
 }
 // fim main
+=======
+    do {
+        system("cls");
+        printf("\nMenu:\n");
+        printf("1. Cadastrar cliente\n");
+        printf("2. Buscar cliente por codigo\n");
+        printf("3. Buscar cliente por nome\n");
+        printf("4. Sair\n");
+        printf("\nEscolha uma opcao: ");
+        scanf("%d", &opcao);
+        limparBuffer();
+
+        switch (opcao) {
+            case 1:
+                cadastrarCliente(fileClientes);
+                break;
+            case 2:
+                printf("\nDigite o codigo do cliente que deseja buscar: ");
+                scanf("%d", &codigoClienteBuscar);
+                limparBuffer();
+                buscarClientePorCodigo(fileClientes, codigoClienteBuscar);
+                break;
+            case 3:
+                printf("\nDigite o nome do cliente que deseja buscar: ");
+                fgets(nomeCliente, sizeof(nomeCliente), stdin);
+                nomeCliente[strcspn(nomeCliente, "\n")] = '\0';
+                buscarClientePorNome(fileClientes, nomeCliente);
+                break;
+            case 4:
+                printf("\nSaindo...\n");
+                break;
+            default:
+                printf("\nOpcao invalida.\n");
+        }
+        printf("\nPressione qualquer tecla para prosseguir...\n");
+        getch();
+    } while (opcao != 4);
+
+    fclose(fileClientes);
+
+    return 0;
+}
+>>>>>>> 056c94d (Cadastro de clientes)
