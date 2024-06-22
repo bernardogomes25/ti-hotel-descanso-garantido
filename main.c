@@ -4,9 +4,11 @@
 #include <locale.h>
 #include <conio.h>
 #include <time.h>
+#include <stdbool.h>
 
 // inicio funcionalidade 1
-typedef struct {
+typedef struct
+{
     int codigo;
     char nome[100];
     char telefone[15];
@@ -14,7 +16,8 @@ typedef struct {
     float salario;
 } Funcionario;
 
-void cadastrarFuncionario(FILE *file) {
+void cadastrarFuncionario(FILE *file)
+{
     Funcionario funcionario;
     Funcionario funcionarioExistente;
 
@@ -22,8 +25,10 @@ void cadastrarFuncionario(FILE *file) {
     scanf("%d", &funcionario.codigo);
     getchar();
     rewind(file);
-    while (fread(&funcionarioExistente, sizeof(Funcionario), 1, file) == 1) {
-        if (funcionarioExistente.codigo == funcionario.codigo) {
+    while (fread(&funcionarioExistente, sizeof(Funcionario), 1, file) == 1)
+    {
+        if (funcionarioExistente.codigo == funcionario.codigo)
+        {
             printf("Erro: Já existe um funcionario com o código %d.\n", funcionario.codigo);
             return;
         }
@@ -47,18 +52,22 @@ void cadastrarFuncionario(FILE *file) {
 // fim funcionalidade 1
 
 // inicio funcionalidade 2
-void buscarFuncionarioPorCodigo(FILE *file, int codigo) {
+void buscarFuncionarioPorCodigo(FILE *file, int codigo)
+{
     Funcionario funcionario;
     int found = 0;
 
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("\nErro ao abrir o arquivo.\n");
         return;
     }
 
     rewind(file);
-    while (fread(&funcionario, sizeof(Funcionario), 1, file) == 1) {
-        if (funcionario.codigo == codigo) {
+    while (fread(&funcionario, sizeof(Funcionario), 1, file) == 1)
+    {
+        if (funcionario.codigo == codigo)
+        {
             printf("\nCodigo: %d\n", funcionario.codigo);
             printf("Nome: %s\n", funcionario.nome);
             printf("Telefone: %s\n", funcionario.telefone);
@@ -69,23 +78,28 @@ void buscarFuncionarioPorCodigo(FILE *file, int codigo) {
         }
     }
 
-    if (!found) {
+    if (!found)
+    {
         printf("\nFuncionario com o codigo %d nao foi encontrado.\n", codigo);
     }
 }
 
-void buscarFuncionarioPorNome(FILE *file, char *nome) {
+void buscarFuncionarioPorNome(FILE *file, char *nome)
+{
     Funcionario funcionario;
     int found = 0;
 
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("\nErro ao abrir o arquivo.\n");
         return;
     }
 
     rewind(file);
-    while (fread(&funcionario, sizeof(Funcionario), 1, file) == 1) {
-        if (strstr(funcionario.nome, nome) != NULL) {
+    while (fread(&funcionario, sizeof(Funcionario), 1, file) == 1)
+    {
+        if (strstr(funcionario.nome, nome) != NULL)
+        {
             printf("\nCodigo: %d\n", funcionario.codigo);
             printf("Nome: %s\n", funcionario.nome);
             printf("Telefone: %s\n", funcionario.telefone);
@@ -95,7 +109,8 @@ void buscarFuncionarioPorNome(FILE *file, char *nome) {
         }
     }
 
-    if (!found) {
+    if (!found)
+    {
         printf("\nFuncionario com o nome %s nao foi encontrado.\n", nome);
     }
 }
@@ -233,16 +248,13 @@ void cadastrarQuarto(FILE *file)
     printf("Digite o valor da diária: ");
     scanf("%f", &quarto.valorDiaria);
     getchar();
-    do
-    {
-        printf("Digite a disponibilidade do quarto (1 para ocupado, 0 para desocupado): ");
-        scanf("%d", &quarto.disponibilidade);
-        getchar();
-    } while (quarto.disponibilidade != 0 && quarto.disponibilidade != 1);
+
+    quarto.disponibilidade = 0;
     quarto.clienteId = -1;
 
     fseek(file, 0, SEEK_END);
     fwrite(&quarto, sizeof(Quarto), 1, file);
+    printf("Quarto cadastrado com sucesso.\n");
 }
 // fim funcionalidade 5
 
@@ -278,7 +290,7 @@ typedef struct
     int numeroQuarto;
 } Estadia;
 
-#include <time.h>
+#define bool _Bool
 
 int calcularDiferencaDias(char *dataEntrada, char *dataSaida)
 {
@@ -310,9 +322,42 @@ int calcularDiferencaDias(char *dataEntrada, char *dataSaida)
     return diferencaDias;
 }
 
-void cadastrarEstadia(FILE *file)
+bool clienteExiste(FILE *fileClientes, int codigoCliente)
+{
+    Cliente cliente;
+
+    rewind(fileClientes);
+    while (fread(&cliente, sizeof(Cliente), 1, fileClientes) == 1)
+    {
+        if (cliente.codigo == codigoCliente)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool quartoExiste(FILE *fileQuartos, int numeroQuarto)
+{
+    Quarto quarto;
+
+    rewind(fileQuartos);
+    while (fread(&quarto, sizeof(Quarto), 1, fileQuartos) == 1)
+    {
+        if (quarto.numero == numeroQuarto)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void cadastrarEstadia(FILE *fileClientes, FILE *fileQuartos, FILE *fileEstadias)
 {
     Estadia estadia;
+    Quarto quarto;
 
     printf("\nDigite o código da estadia: ");
     scanf("%d", &estadia.codigoEstadia);
@@ -323,11 +368,31 @@ void cadastrarEstadia(FILE *file)
     estadia.quantidadeDiarias = calcularDiferencaDias(estadia.dataEntrada, estadia.dataSaida);
     printf("Digite o código do cliente: ");
     scanf("%d", &estadia.codigoCliente);
+
+    if (!clienteExiste(fileClientes, estadia.codigoCliente))
+    {
+        printf("Erro: Cliente com o código %d não existe.\n", estadia.codigoCliente);
+        return;
+    }
+
     printf("Digite o número do quarto: ");
     scanf("%d", &estadia.numeroQuarto);
 
-    fseek(file, 0, SEEK_END);
-    fwrite(&estadia, sizeof(Estadia), 1, file);
+    if (!quartoExiste(fileQuartos, estadia.numeroQuarto))
+    {
+        printf("Erro: Quarto número %d não existe.\n", estadia.numeroQuarto);
+        return;
+    }
+
+    if (quarto.disponibilidade == 1)
+    {
+        printf("Erro: Quarto número %d está ocupado.\n", estadia.numeroQuarto);
+        return;
+    }
+
+    fseek(fileEstadias, 0, SEEK_END);
+    fwrite(&estadia, sizeof(Estadia), 1, fileEstadias);
+    printf("Estadia cadastrada com sucesso.\n");
 }
 // fim funcionalidade 7
 
@@ -494,7 +559,7 @@ int main()
             buscarQuarto(fileQuartos, numeroQuarto);
             break;
         case 9:
-            cadastrarEstadia(fileEstadias);
+            cadastrarEstadia(fileClientes, fileQuartos, fileEstadias);
             break;
         case 10:
             printf("\nDigite o código do cliente que deseja buscar estadias: ");
