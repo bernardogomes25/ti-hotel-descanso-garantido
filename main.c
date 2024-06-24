@@ -271,7 +271,7 @@ void buscarQuarto(FILE *file, int numeroQuarto)
             printf("\nNúmero do quarto: %d\n", quarto.numero);
             printf("Quantidade de hóspedes: %d\n", quarto.quantidadeHospedes);
             printf("Valor da diária: %.2f\n", quarto.valorDiaria);
-            printf("Disponibilidade: %s\n", quarto.disponibilidade ? "Ocupado" : "Desocupado");
+            printf("Disponibilidade: %s\n", quarto.disponibilidade == 1 ? "Ocupado" : "Desocupado");
             return;
         }
     }
@@ -390,6 +390,8 @@ void cadastrarEstadia(FILE *fileClientes, FILE *fileQuartos, FILE *fileEstadias)
         return;
     }
 
+    quarto.disponibilidade = 1;
+
     fseek(fileEstadias, 0, SEEK_END);
     fwrite(&estadia, sizeof(Estadia), 1, fileEstadias);
     printf("Estadia cadastrada com sucesso.\n");
@@ -422,6 +424,84 @@ void mostrarEstadiaPorCliente(FILE *file, int codigoCliente)
     }
 }
 // fim funcionalidade 8
+
+// inicio funcionalidade 9
+void darBaixaEstadia(FILE *fileEstadias, FILE *fileQuartos, int codigoEstadia)
+{
+    Estadia estadia;
+    Quarto quarto;
+    int foundEstadia = 0;
+    int foundQuarto = 0;
+    FILE *tempFileEstadias;
+
+    if ((tempFileEstadias = fopen("tempEstadias.dat", "w+b")) == NULL)
+    {
+        printf("\nErro ao criar arquivo temporário.\n");
+        return;
+    }
+
+    rewind(fileEstadias);
+    while (fread(&estadia, sizeof(Estadia), 1, fileEstadias) == 1)
+    {
+        if (estadia.codigoEstadia == codigoEstadia)
+        {
+            foundEstadia = 1;
+            rewind(fileQuartos);
+            while (fread(&quarto, sizeof(Quarto), 1, fileQuartos) == 1)
+            {
+                if (quarto.numero == estadia.numeroQuarto)
+                {
+                    foundQuarto = 1;
+                    float total = quarto.valorDiaria * estadia.quantidadeDiarias;
+                    printf("\nDetalhes da Estadia:\n");
+                    printf("Código da estadia: %d\n", estadia.codigoEstadia);
+                    printf("Data de entrada: %s\n", estadia.dataEntrada);
+                    printf("Data de saída: %s\n", estadia.dataSaida);
+                    printf("Quantidade de diárias: %d\n", estadia.quantidadeDiarias);
+                    printf("Número do quarto: %d\n", estadia.numeroQuarto);
+                    printf("Valor total: %.2f\n", total);
+                    printf("Confirmar pagamento? (1 para sim, 0 para não): ");
+                    int confirmacao;
+                    scanf("%d", &confirmacao);
+
+                    if (confirmacao == 1)
+                    {
+                        printf("\nPagamento confirmado. Estadia finalizada.\n");
+                        quarto.disponibilidade = 0;
+                        fseek(fileQuartos, -sizeof(Quarto), SEEK_CUR);
+                        fwrite(&quarto, sizeof(Quarto), 1, fileQuartos);
+                    }
+                    else
+                    {
+                        printf("\nPagamento não confirmado. Estadia não finalizada.\n");
+                        fwrite(&estadia, sizeof(Estadia), 1, tempFileEstadias);
+                    }
+                    break;
+                }
+            }
+        }
+        else
+        {
+            fwrite(&estadia, sizeof(Estadia), 1, tempFileEstadias);
+        }
+    }
+
+    if (!foundEstadia)
+    {
+        printf("\nEstadia com o código %d não foi encontrada.\n", codigoEstadia);
+    }
+    else if (!foundQuarto)
+    {
+        printf("\nQuarto associado à estadia não foi encontrado.\n");
+    }
+
+    fclose(fileEstadias);
+    fclose(tempFileEstadias);
+    remove("estadias.dat");
+    rename("tempEstadias.dat", "estadias.dat");
+    fileEstadias = fopen("estadias.dat", "r+b");
+}
+// fim funcionalidade 9
 
 // inicio main
 int main()
@@ -493,6 +573,7 @@ int main()
         printf("8. Buscar quarto\n");
         printf("9. Cadastrar estadia\n");
         printf("10. Buscar estadia por cliente\n");
+        printf("11. Dar baixa em uma estadia\n");
         printf("13. Sair\n");
         printf("\nEscolha uma opção: ");
         scanf("%d", &opcao);
@@ -565,6 +646,12 @@ int main()
             printf("\nDigite o código do cliente que deseja buscar estadias: ");
             scanf("%d", &codigoCliente);
             mostrarEstadiaPorCliente(fileEstadias, codigoCliente);
+            break;
+        case 11:
+            printf("\nDigite o codigo da estadia que deseja dar baixa: ");
+            int codigoEstadia;
+            scanf("%d", &codigoEstadia);
+            darBaixaEstadia(fileEstadias, fileQuartos, codigoEstadia);
             break;
         case 13:
             printf("\nSaindo...\n");
